@@ -31,7 +31,8 @@ RUN apt-get -y update && apt-get install -y \
     python-setuptools \
     python-pip \
     python-mysql.connector \
-    supervisor
+    supervisor \
+    wget
 
 RUN echo 'mysql-server mysql-server/root_password password root' |  debconf-set-selections; \
     echo 'mysql-server mysql-server/root_password_again password root' |  debconf-set-selections;
@@ -41,18 +42,25 @@ RUN apt-get install -qqy mysql-server && \
 
 RUN (/usr/bin/mysqld_safe &); sleep 5; mysqladmin -u root -proot password ''
 
-COPY tools/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-COPY . ./root
+RUN wget -nv https://raw.githubusercontent.com/ikoula/cloudstack/master/tools/docker/supervisord.conf -O /etc/supervisor/conf.d/supervisord.conf
+
 WORKDIR /root
 
+RUN git clone https://github.com/ikoula/cloudstack.git
+
+WORKDIR /root/cloudstack
+
+RUN git checkout tags/4.9.0
+
 RUN mvn -Pdeveloper -Dsimulator -DskipTests clean install
+
+ENV PKG_URL=http://jenkins.buildacloud.org/job/cloudstack-marvin-master/lastSuccessfulBuild/artifact/tools/marvin/dist/Marvin-4.9.0-SNAPSHOT.tar.gz
 
 RUN (/usr/bin/mysqld_safe &); \
     sleep 3; \
     mvn -Pdeveloper -pl developer -Ddeploydb; \
     mvn -Pdeveloper -pl developer -Ddeploydb-simulator; \
-    MARVIN_FILE=`find tools/marvin/dist/ -name "Marvin*.tar.gz"` \
-    pip install $MARVIN_FILE
+    pip install $PKG_URL
 
 EXPOSE 8080 8096
 
