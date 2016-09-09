@@ -52,14 +52,16 @@ WORKDIR /root/cloudstack
 
 RUN git checkout tags/4.9.0
 
-RUN mvn -Pdeveloper -Dsimulator -DskipTests clean install
+RUN mvn -Pdeveloper,systemvm -Dsimulator -DskipTests clean install
+
+RUN wget -nv http://download.cloud.com.s3.amazonaws.com/tools/vhd-util -O /root/cloudstack/scripts/vm/hypervisor/xenserver/vhd-util
 
 ENV PKG_URL=http://jenkins.buildacloud.org/job/cloudstack-marvin-master/lastSuccessfulBuild/artifact/tools/marvin/dist/Marvin-4.9.0-SNAPSHOT.tar.gz
 
 RUN (/usr/bin/mysqld_safe &); \
     sleep 3; \
-    mvn -Pdeveloper -pl developer -Ddeploydb; \
-    mvn -Pdeveloper -pl developer -Ddeploydb-simulator; \
+    mvn -Pdeveloper,systemvm -pl developer -Ddeploydb; \
+    mvn -Pdeveloper,systemvm -pl developer -Ddeploydb-simulator; \
     pip install $PKG_URL
 
 EXPOSE 8080 8096
