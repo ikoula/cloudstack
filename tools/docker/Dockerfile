@@ -45,7 +45,7 @@ RUN apt-get install -qqy mysql-server && \
 
 RUN (/usr/bin/mysqld_safe &); sleep 5; mysqladmin -u root -proot password ''
 
-RUN wget -nv https://raw.githubusercontent.com/ikoula/cloudstack/master/tools/docker/supervisord.conf -O /etc/supervisor/conf.d/supervisord.conf
+RUN wget -nv https://raw.githubusercontent.com/ikoula/cloudstack/ikoula/tools/docker/supervisord.conf -O /etc/supervisor/conf.d/supervisord.conf
 
 WORKDIR /root
 
