@@ -23,8 +23,11 @@ MAINTAINER "IKOULA's CloudStack Team" <cloudstack@ikoula.com>
 LABEL Vendor="Apache.org" License="ApacheV2" Version="4.6.0"
 
 RUN apt-get -y update && apt-get install -y \
+    build-essential \
     genisoimage \
     git \
+    libssl-dev \
+    libffi-dev \
     maven \
     openjdk-8-jdk \
     python-dev \
