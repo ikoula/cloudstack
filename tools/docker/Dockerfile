@@ -17,19 +17,20 @@
 #
 # CloudStack-simulator build
 
-FROM ubuntu:14.04
+FROM phusion/baseimage:latest
 
-MAINTAINER "Apache CloudStack" <dev@cloudstack.apache.org>
+MAINTAINER "IKOULA's CloudStack Team" <cloudstack@ikoula.com>
 LABEL Vendor="Apache.org" License="ApacheV2" Version="4.6.0"
 
 RUN apt-get -y update && apt-get install -y \
     genisoimage \
     git \
     maven \
-    openjdk-7-jdk \
+    openjdk-8-jdk \
     python-dev \
     python-setuptools \
     python-pip \
+    python-mysql.connector \
     supervisor
 
 RUN echo 'mysql-server mysql-server/root_password password root' |  debconf-set-selections; \
@@ -39,8 +40,6 @@ RUN apt-get install -qqy mysql-server && \
     apt-get clean all
 
 RUN (/usr/bin/mysqld_safe &); sleep 5; mysqladmin -u root -proot password ''
-
-RUN pip install --allow-external mysql-connector-python mysql-connector-python
 
 COPY tools/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY . ./root
